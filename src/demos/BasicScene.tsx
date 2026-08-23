@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import GUI from 'lil-gui'
 
 const BasicScene = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -27,11 +28,62 @@ const BasicScene = () => {
     const cube = new THREE.Mesh(geometry, material)
     scene.add(cube)
 
+    // ------------------------------------------------------------
+    // lil-gui 调试面板：把原本写死的旋转速度、颜色、尺寸暴露成滑块/调色板
+    // 这是 Three.js 可视化调参的标准模式
+    // ------------------------------------------------------------
+    const params = {
+      rotXSpeed: 0.01,   // X 轴每帧旋转增量
+      rotYSpeed: 0.01,   // Y 轴每帧旋转增量
+      color: '#00ff00',  // 立方体颜色
+      sizeX: 1,          // 宽度
+      sizeY: 1,          // 高度
+      sizeZ: 1,          // 深度
+      bg: '#1a1a2e',     // 场景背景色
+      autoRotate: true,  // 自动旋转开关
+    }
+
+    const gui = new GUI({ title: '🛠️ 立方体调试面板', width: 280 })
+    gui.domElement.style.position = 'absolute'
+    gui.domElement.style.top = '16px'
+    gui.domElement.style.right = '16px'
+    gui.domElement.style.zIndex = '9999'
+    containerRef.current.appendChild(gui.domElement)
+
+    const fMotion = gui.addFolder('🎬 运动')
+    fMotion.add(params, 'autoRotate').name('自动旋转')
+    fMotion.add(params, 'rotXSpeed', -0.1, 0.1, 0.001).name('X 轴转速')
+    fMotion.add(params, 'rotYSpeed', -0.1, 0.1, 0.001).name('Y 轴转速')
+
+    const fStyle = gui.addFolder('🎨 外观')
+    fStyle.addColor(params, 'color').name('立方体颜色')
+      .onChange((v: string | number | THREE.Color) => material.color.set(v))
+    fStyle.add(params, 'sizeX', 0.2, 3, 0.01).name('宽度')
+      .onChange(() => {
+        geometry.dispose()
+        cube.geometry = new THREE.BoxGeometry(params.sizeX, params.sizeY, params.sizeZ)
+      })
+    fStyle.add(params, 'sizeY', 0.2, 3, 0.01).name('高度')
+      .onChange(() => {
+        geometry.dispose()
+        cube.geometry = new THREE.BoxGeometry(params.sizeX, params.sizeY, params.sizeZ)
+      })
+    fStyle.add(params, 'sizeZ', 0.2, 3, 0.01).name('深度')
+      .onChange(() => {
+        geometry.dispose()
+        cube.geometry = new THREE.BoxGeometry(params.sizeX, params.sizeY, params.sizeZ)
+      })
+    fStyle.addColor(params, 'bg').name('背景色')
+      .onChange((v: string | number | THREE.Color) => scene.background = new THREE.Color(v))
+
     let animationId: number
     const animate = () => {
       animationId = requestAnimationFrame(animate)
-      cube.rotation.x += 0.01
-      cube.rotation.y += 0.01
+      // 是否旋转由 GUI 的 autoRotate 开关决定
+      if (params.autoRotate) {
+        cube.rotation.x += params.rotXSpeed
+        cube.rotation.y += params.rotYSpeed
+      }
       renderer.render(scene, camera)
     }
     animate()
@@ -47,6 +99,8 @@ const BasicScene = () => {
     return () => {
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animationId)
+      gui.destroy()
+      if (gui.domElement.parentNode) gui.domElement.parentNode.removeChild(gui.domElement)
       geometry.dispose()
       material.dispose()
       renderer.dispose()
@@ -123,6 +177,7 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     background: '#1a1a2e',
     minWidth: 0,
+    position: 'relative',   // 让 lil-gui 的 absolute 定位以 canvas 为参照物
   },
   panel: {
     width: '380px',

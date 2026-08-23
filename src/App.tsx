@@ -7,8 +7,12 @@ import AnimationInteraction from './demos/AnimationInteraction'
 import ParticleSystem from './demos/ParticleSystem'
 import Shaders from './demos/Shaders'
 import LoadModel from './demos/LoadModel'
+import DigitalTwin from './demos/DigitalTwin'
+import ReactThreeFiberDemo from './demos/ReactThreeFiberDemo'
 
 const demos = [
+  { path: '/digital-twin', label: '数字孪生' },
+  { path: '/r3f', label: 'R3F + drei 学习' },
   { path: '/basic', label: '基础场景' },
   { path: '/geometries', label: '几何体' },
   { path: '/materials', label: '材质' },
@@ -51,6 +55,14 @@ function ModelDemo() {
   return <LoadModel />
 }
 
+function DigitalTwinDemo() {
+  return <DigitalTwin />
+}
+
+function R3FDemo() {
+  return <ReactThreeFiberDemo />
+}
+
 function App() {
   return (
     <div className="app-layout">
@@ -74,7 +86,9 @@ function App() {
       </aside>
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/basic" replace />} />
+          <Route path="/" element={<Navigate to="/digital-twin" replace />} />
+          <Route path="/digital-twin" element={<DigitalTwinDemo />} />
+          <Route path="/r3f" element={<R3FDemo />} />
           <Route path="/basic" element={<BasicDemo />} />
           <Route path="/geometries" element={<GeometriesDemo />} />
           <Route path="/materials" element={<MaterialsDemo />} />
