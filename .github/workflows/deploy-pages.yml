@@ -41,9 +41,6 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      - name: 修复 SPA 路由（复制 index.html 为 404.html）
-        run: cp dist/index.html dist/404.html
-
       - name: 上传构建产物（供 deploy job 使用）
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
