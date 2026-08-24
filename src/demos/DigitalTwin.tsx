@@ -662,8 +662,8 @@ const DigitalTwin = () => {
     let lastLogTime = 0   // 用于"每 5 秒一条运行日志"的时间戳记录
     const animate = () => {
       frameIdRef.current = requestAnimationFrame(animate)
-      const elapsed = clock.getElapsedTime()  // 自页面加载以来的累计秒数
-      const delta = clock.getDelta()          // 距上一帧的秒数（用于时间无关的移动）
+      const delta = clock.getDelta()          // 必须先取 delta！Three.js Clock 会在 getElapsedTime() 内部重置 delta
+      const elapsed = clock.getElapsedTime()  // 再取累计时间（不影响后续使用）
 
       // ------------------------------
       // 11.1 遍历每台设备，更新旋转环 + 警示灯 + 振动（所有数字均来自 lil-gui 调试面板 tweakParams）

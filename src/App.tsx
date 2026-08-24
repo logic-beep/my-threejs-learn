@@ -8,10 +8,12 @@ import ParticleSystem from './demos/ParticleSystem'
 import Shaders from './demos/Shaders'
 import LoadModel from './demos/LoadModel'
 import DigitalTwin from './demos/DigitalTwin'
+import DigitalTwinR3F from './demos/DigitalTwinR3F'
 import ReactThreeFiberDemo from './demos/ReactThreeFiberDemo'
 
 const demos = [
-  { path: '/digital-twin', label: '数字孪生' },
+  { path: '/digital-twin', label: '数字孪生 (原生 Three)' },
+  { path: '/digital-twin-r3f', label: '数字孪生 (R3F版)' },
   { path: '/r3f', label: 'R3F + drei 学习' },
   { path: '/basic', label: '基础场景' },
   { path: '/geometries', label: '几何体' },
@@ -59,6 +61,10 @@ function DigitalTwinDemo() {
   return <DigitalTwin />
 }
 
+function DigitalTwinR3FDemo() {
+  return <DigitalTwinR3F />
+}
+
 function R3FDemo() {
   return <ReactThreeFiberDemo />
 }
@@ -88,6 +94,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/digital-twin" replace />} />
           <Route path="/digital-twin" element={<DigitalTwinDemo />} />
+          <Route path="/digital-twin-r3f" element={<DigitalTwinR3FDemo />} />
           <Route path="/r3f" element={<R3FDemo />} />
           <Route path="/basic" element={<BasicDemo />} />
           <Route path="/geometries" element={<GeometriesDemo />} />
