@@ -13,7 +13,7 @@ import ReactThreeFiberDemo from './demos/ReactThreeFiberDemo'
 import CesiumSmartCity from './demos/CesiumSmartCity'
 
 const demos = [
-  { path: '/cesium-smart-city', label: '智慧城市 (Cesium版)' },
+  // { path: '/cesium-smart-city', label: '智慧城市 (Cesium版)' },
   { path: '/digital-twin', label: '数字孪生 (原生 Three)' },
   { path: '/digital-twin-r3f', label: '数字孪生 (R3F版)' },
   { path: '/r3f', label: 'R3F + drei 学习' },
