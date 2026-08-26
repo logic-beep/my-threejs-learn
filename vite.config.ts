@@ -1,5 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import * as cesiumPkg from 'vite-plugin-cesium'
+
+const cesiumPlugin = (cesiumPkg as unknown as {
+  default?: (opts?: object) => unknown
+  vitePluginCesium?: (opts?: object) => unknown
+}).default ?? (cesiumPkg as unknown as (opts?: object) => unknown)
 
 export default defineConfig(({ mode }) => {
   let base = '/'
@@ -12,7 +18,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    plugins: [react()],
+    plugins: [react(), cesiumPlugin() as never],
+    optimizeDeps: {
+      exclude: ['cesium'],
+    },
     build: {
       rollupOptions: {
         output: {
