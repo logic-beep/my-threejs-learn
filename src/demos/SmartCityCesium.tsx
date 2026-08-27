@@ -326,24 +326,39 @@ const SmartCityCesium = () => {
         viewer.scene.canvas.addEventListener('webglcontextlost', onCtxLost)
       }
 
-      // 初始相机视角：斜俯视城市中心
-      const center = Cartesian3.fromDegrees(CITY_CENTER.lon, CITY_CENTER.lat, 0)
+      // ----------------------------------------------------------
+      // 初始相机视角：直接 setView 到正确位置（避免 flyTo 中途怪视角）
+      // - 目标中心：上海市中心 (121.49°E, 31.24°N)
+      // - 观测点：城市正南方向略偏东 1.3km，高度 1200m
+      // - heading=15°（略朝东偏北看中心），pitch=-45°（斜俯视）
+      // ----------------------------------------------------------
+      const targetLon = CITY_CENTER.lon
+      const targetLat = CITY_CENTER.lat
+      //   相机位置：目标正南 0.012°(≈1.3km)，正东 0.002°(≈220m)，海拔 1200m
+      const camLon = targetLon + 0.002
+      const camLat = targetLat - 0.012
+      const camHeight = 1200
       viewer.camera.setView({
-        destination: Cartesian3.fromDegrees(CITY_CENTER.lon + 0.002, CITY_CENTER.lat - 0.012, 1800),
+        destination: Cartesian3.fromDegrees(camLon, camLat, camHeight),
         orientation: {
-          heading: CesiumMath.toRadians(10),
+          heading: CesiumMath.toRadians(15),
           pitch: CesiumMath.toRadians(-45),
           roll: 0,
         },
       })
+      //   然后缓慢平滑飞到更近的位置（斜俯视 1.6km，俯仰角更陡 -60°）
       void viewer.camera.flyTo({
-        destination: center,
-        orientation: new HeadingPitchRange(
-          CesiumMath.toRadians(0),
-          CesiumMath.toRadians(-55),
-          1500,
+        destination: Cartesian3.fromDegrees(
+          targetLon - 0.0005,
+          targetLat - 0.007,
+          850,
         ),
-        duration: 3,
+        orientation: {
+          heading: CesiumMath.toRadians(0),
+          pitch: CesiumMath.toRadians(-60),
+          roll: 0,
+        },
+        duration: 4,
       })
 
       // 开启光照
@@ -512,11 +527,18 @@ const SmartCityCesium = () => {
       })
 
       const fCam = gui.addFolder('相机视角')
+      // 构造一个城市中心的虚拟目标实体，用 viewer.flyTo(target, { orientation: HPR })
+      // 的正确语义：HPR 表示 "相对于目标点的方位角/俯仰/直线距离"，
+      // 完全避免 camera.flyTo(Cartesian3, HPR) 的语义冲突。
+      const centerTarget = viewer.entities.add({
+        position: new ConstantPositionProperty(
+          Cartesian3.fromDegrees(targetLon, targetLat, 0),
+        ),
+      })
       const flyToView = (headingDeg: number, pitchDeg: number, range: number) => {
         if (!viewer) return
-        void viewer.camera.flyTo({
-          destination: center,
-          orientation: new HeadingPitchRange(
+        void viewer.flyTo(centerTarget, {
+          offset: new HeadingPitchRange(
             CesiumMath.toRadians(headingDeg),
             CesiumMath.toRadians(pitchDeg),
             range,
