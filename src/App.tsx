@@ -10,8 +10,10 @@ import LoadModel from './demos/LoadModel'
 import DigitalTwin from './demos/DigitalTwin'
 import DigitalTwinR3F from './demos/DigitalTwinR3F'
 import ReactThreeFiberDemo from './demos/ReactThreeFiberDemo'
+import SmartCityCesium from './demos/SmartCityCesium'
 
 const demos = [
+  { path: '/smart-city', label: '智慧城市 (Cesium)' },
   { path: '/digital-twin', label: '数字孪生 (原生 Three)' },
   { path: '/digital-twin-r3f', label: '数字孪生 (R3F版)' },
   { path: '/r3f', label: 'R3F + drei 学习' },
@@ -69,6 +71,10 @@ function R3FDemo() {
   return <ReactThreeFiberDemo />
 }
 
+function SmartCityCesiumDemo() {
+  return <SmartCityCesium />
+}
+
 function App() {
   return (
     <div className="app-layout">
@@ -92,7 +98,8 @@ function App() {
       </aside>
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/digital-twin" replace />} />
+          <Route path="/" element={<Navigate to="/smart-city" replace />} />
+          <Route path="/smart-city" element={<SmartCityCesiumDemo />} />
           <Route path="/digital-twin" element={<DigitalTwinDemo />} />
           <Route path="/digital-twin-r3f" element={<DigitalTwinR3FDemo />} />
           <Route path="/r3f" element={<R3FDemo />} />

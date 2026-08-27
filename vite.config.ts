@@ -1,5 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { cesiumEngine } from 'vite-plugin-cesium-engine'
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig(({ mode }) => {
   let base = '/'
@@ -10,9 +15,31 @@ export default defineConfig(({ mode }) => {
     }
   }
 
+  const assetsPath = 'cesium'
+  const cesiumBaseUrl = `${base === '/' ? '' : base}${assetsPath}`
+
   return {
     base,
-    plugins: [react()],
+    plugins: [
+      react(),
+      cesiumEngine({
+        assetsPath,
+        cesiumBaseUrl,
+        chunkName: 'vendor-cesium',
+        debug: mode !== 'production',
+      }),
+    ],
+    resolve: {
+      alias: {
+        '@zip.js/zip.js/lib/zip-no-worker.js': path.resolve(
+          __dirname,
+          'node_modules/@zip.js/zip.js/index.js',
+        ),
+      },
+    },
+    optimizeDeps: {
+      include: ['@cesium/engine', '@cesium/widgets'],
+    },
     build: {
       rollupOptions: {
         output: {
